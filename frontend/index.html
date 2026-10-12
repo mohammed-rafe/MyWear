@@ -1,0 +1,193 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discover your style with MyWear — modern fashion for everyday life.">
+    <title>MyWear | Wear Your Identity</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Announcement bar -->
+    <div class="announcement">
+        YOUR STYLE, YOUR STORY. WELCOME TO MYWEAR.
+    </div>
+
+    <!-- Navigation -->
+    <header class="navbar">
+        <a href="#" class="logo">mywear<span>.</span></a>
+
+        <nav class="nav-links" id="navLinks">
+            <a href="#home">Home</a>
+            <a href="#collections">Collections</a>
+            <a href="#products">Shop</a>
+            <a href="#about">About</a>
+        </nav>
+
+        <div class="nav-actions">
+            <button class="icon-btn" id="searchBtn" aria-label="Search">⌕</button>
+            <button class="icon-btn cart-btn" id="cartBtn" aria-label="Shopping cart">
+                Bag <span id="cartCount">0</span>
+            </button>
+            <button class="menu-btn" id="menuBtn" aria-label="Toggle menu">☰</button>
+        </div>
+    </header>
+
+    <!-- Search panel -->
+    <div class="search-panel" id="searchPanel">
+        <input type="search" id="searchInput" placeholder="Search shirts, hoodies, jeans...">
+        <button id="closeSearch" aria-label="Close search">✕</button>
+    </div>
+
+    <main>
+        <!-- Hero section -->
+        <section class="hero" id="home">
+            <div class="hero-content">
+                <span class="eyebrow">THE NEW SEASON / 2026</span>
+                <h1>Wear your<br><em>identity.</em></h1>
+                <p>Style that speaks before you do. Discover everyday essentials made for the way you live.</p>
+                <a href="#products" class="btn btn-dark">Explore collection <span>↗</span></a>
+                <div class="hero-note">EVERYDAY STYLE. EXTRAORDINARY YOU.</div>
+            </div>
+
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1200&q=85"
+                     alt="Fashion models wearing modern everyday outfits">
+                <div class="image-tag">NEW SEASON<br><strong>NEW ENERGY.</strong></div>
+            </div>
+            <span class="hero-index">MW — 001</span>
+        </section>
+
+        <!-- Benefits -->
+        <section class="benefits">
+            <div>✳ &nbsp; EVERYDAY ESSENTIALS</div>
+            <div>✳ &nbsp; STYLE WITHOUT LIMITS</div>
+            <div>✳ &nbsp; MADE FOR YOUR MOMENTS</div>
+        </section>
+
+        <!-- Collections -->
+        <section class="section collections" id="collections">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">FIND YOUR FIT</span>
+                    <h2>Made for <em>your mood.</em></h2>
+                </div>
+                <p>From laid-back basics to statement looks,<br>find the style that feels like you.</p>
+            </div>
+
+            <div class="collection-grid">
+                <a href="#products" class="collection-card" data-category="Men">
+                    <img src="https://images.unsplash.com/photo-1516257984-b1b4d707412e?auto=format&fit=crop&w=800&q=80" alt="Men's casual fashion">
+                    <div class="collection-overlay">
+                        <span>01 / THE EVERYDAY EDIT</span>
+                        <h3>Men's Wear</h3>
+                        <span class="collection-link">Explore collection ↗</span>
+                    </div>
+                </a>
+
+                <a href="#products" class="collection-card" data-category="Women">
+                    <img src="https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?auto=format&fit=crop&w=800&q=80" alt="Women's contemporary fashion">
+                    <div class="collection-overlay">
+                        <span>02 / THE MODERN EDIT</span>
+                        <h3>Women's Wear</h3>
+                        <span class="collection-link">Explore collection ↗</span>
+                    </div>
+                </a>
+
+                <a href="#products" class="collection-card" data-category="Accessories">
+                    <img src="https://images.unsplash.com/photo-1523398002811-999ca8dec234?auto=format&fit=crop&w=800&q=80" alt="Casual streetwear and accessories">
+                    <div class="collection-overlay">
+                        <span>03 / THE FINISHING TOUCH</span>
+                        <h3>Accessories</h3>
+                        <span class="collection-link">Explore collection ↗</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Products -->
+        <section class="section products-section" id="products">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">HANDPICKED FOR YOU</span>
+                    <h2>The latest <em>looks.</em></h2>
+                </div>
+                <span class="product-count" id="productCount">04 PRODUCTS</span>
+            </div>
+
+            <div class="filter-bar">
+                <div class="filters">
+                    <button class="filter-btn active" data-filter="All">All pieces</button>
+                    <button class="filter-btn" data-filter="Men">Men</button>
+                    <button class="filter-btn" data-filter="Women">Women</button>
+                    <button class="filter-btn" data-filter="Accessories">Accessories</button>
+                </div>
+                <select id="sortSelect" aria-label="Sort products">
+                    <option value="featured">Featured</option>
+                    <option value="low">Price: Low to high</option>
+                    <option value="high">Price: High to low</option>
+                </select>
+            </div>
+
+            <div class="product-grid" id="productGrid"></div>
+            <p class="empty-message" id="emptyMessage" hidden>No products found. Try another search.</p>
+        </section>
+
+        <!-- About banner -->
+        <section class="about-banner" id="about">
+            <div class="about-image">
+                <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=85"
+                     alt="A contemporary clothing store">
+            </div>
+            <div class="about-content">
+                <span class="eyebrow">MORE THAN WHAT YOU WEAR</span>
+                <h2>Good clothes.<br><em>Great confidence.</em></h2>
+                <p>MyWear is about finding your own style, feeling comfortable and showing up as yourself — every single day.</p>
+                <a href="#collections" class="btn btn-light">Discover MyWear ↗</a>
+            </div>
+        </section>
+
+        <!-- Newsletter -->
+        <section class="newsletter">
+            <span class="eyebrow">LET'S STAY IN STYLE</span>
+            <h2>A little more <em>you.</em></h2>
+            <p>Get updates on new collections and what's coming next.</p>
+            <form id="newsletterForm">
+                <input type="email" id="emailInput" placeholder="Your email address" required>
+                <button type="submit">Sign me up ↗</button>
+            </form>
+            <p class="form-message" id="formMessage" aria-live="polite"></p>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <a href="#home" class="logo">mywear<span>.</span></a>
+        <p>Wear your identity. © <span id="year"></span> MyWear.</p>
+        <a href="#home">Back to top ↑</a>
+    </footer>
+
+    <!-- Shopping cart drawer -->
+    <div class="cart-backdrop" id="cartBackdrop"></div>
+    <aside class="cart-drawer" id="cartDrawer" aria-label="Shopping cart" aria-hidden="true">
+        <div class="cart-heading">
+            <h2>Your bag <span id="drawerCount">(0)</span></h2>
+            <button id="closeCart" aria-label="Close cart">✕</button>
+        </div>
+        <div id="cartItems" class="cart-items"></div>
+        <div class="cart-footer">
+            <div class="cart-total"><span>Subtotal</span><strong id="cartTotal">₹0</strong></div>
+            <p>Shipping and taxes calculated at checkout.</p>
+            <button class="btn btn-dark checkout-btn" id="checkoutBtn">Continue to checkout ↗</button>
+            <p id="checkoutMessage" class="form-message" aria-live="polite"></p>
+        </div>
+    </aside>
+
+    <script src="script.js"></script>
+</body>
+</html>

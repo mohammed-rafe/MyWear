@@ -1055,3 +1055,8 @@ h1 em, h2 em {
         padding: 24px;
     }
 }
+
+/* Keep the products heading visible after search scrolling */
+#productGrid {
+    scroll-margin-top: 120px;
+}

@@ -1,4 +1,10 @@
 
+// ============================================
+// MYWEAR - FASHION E-COMMERCE FRONTEND
+// Demo only: No backend or real payment yet.
+// ============================================
+
+// 1. PRODUCT DATA
 const products = [
     {
         id: 1,
@@ -34,24 +40,45 @@ const products = [
     }
 ];
 
+// 2. AVAILABLE DEMO SIZES AND COLOURS
+const productOptions = {
+    1: { sizes: ["S", "M", "L", "XL"], colors: ["White", "Black"] },
+    2: { sizes: ["S", "M", "L"], colors: ["White", "Pink", "Black"] },
+    3: { sizes: ["M", "L", "XL"], colors: ["Black", "Grey"] },
+    4: { sizes: ["One Size"], colors: ["Natural", "Black"] }
+};
+
+// 3. APPLICATION STATE
 let activeCategory = "All";
 let searchQuery = "";
 let cart = [];
 
+// 4. HTML ELEMENTS
 const productGrid = document.getElementById("productGrid");
 const productCount = document.getElementById("productCount");
 const emptyMessage = document.getElementById("emptyMessage");
+const searchPanel = document.getElementById("searchPanel");
+const searchInput = document.getElementById("searchInput");
+const productModal = document.getElementById("productModal");
+const cartDrawer = document.getElementById("cartDrawer");
+const cartBackdrop = document.getElementById("cartBackdrop");
 
-const formatPrice = amount =>
-    new Intl.NumberFormat("en-IN", {
+// 5. PRICE FORMATTER
+function formatPrice(amount) {
+    return new Intl.NumberFormat("en-IN", {
         style: "currency",
         currency: "INR",
         maximumFractionDigits: 0
     }).format(amount);
+}
 
-// Display products
+// ============================================
+// 6. RENDER PRODUCTS
+// ============================================
 function renderProducts() {
-    let filtered = products.filter(product => {
+    if (!productGrid) return;
+
+    let filteredProducts = products.filter(product => {
         const matchesCategory =
             activeCategory === "All" ||
             product.category === activeCategory;
@@ -64,34 +91,42 @@ function renderProducts() {
         return matchesCategory && matchesSearch;
     });
 
-    const sort = document.getElementById("sortSelect").value;
+    const sortSelect = document.getElementById("sortSelect");
+    const sort = sortSelect ? sortSelect.value : "featured";
 
     if (sort === "low") {
-        filtered.sort((a, b) => a.price - b.price);
+        filteredProducts.sort((a, b) => a.price - b.price);
     } else if (sort === "high") {
-        filtered.sort((a, b) => b.price - a.price);
+        filteredProducts.sort((a, b) => b.price - a.price);
     }
 
-    productCount.textContent =
-        `${String(filtered.length).padStart(2, "0")} PRODUCTS`;
+    if (productCount) {
+        productCount.textContent =
+            `${String(filteredProducts.length).padStart(2, "0")} PRODUCTS`;
+    }
 
-    emptyMessage.hidden = filtered.length !== 0;
+    if (emptyMessage) {
+        emptyMessage.hidden = filteredProducts.length !== 0;
+    }
 
-    productGrid.innerHTML = filtered.map(product => `
-        <article class="product-card">
+    productGrid.innerHTML = filteredProducts.map(product => `
+        <article class="product-card" data-product-id="${product.id}">
             <div class="product-image">
                 <img
                     src="${product.image}"
                     alt="${product.name}"
                     loading="lazy"
                 >
+
                 <span class="product-badge">${product.badge}</span>
+
                 <button
                     class="add-btn"
                     data-add="${product.id}"
-                    aria-label="Add ${product.name} to bag"
+                    aria-label="Quick add ${product.name} to bag"
                 >+</button>
             </div>
+
             <div class="product-info">
                 <span class="product-category">${product.category}</span>
                 <h3>${product.name}</h3>
@@ -101,23 +136,27 @@ function renderProducts() {
     `).join("");
 }
 
-// Category filters
+// ============================================
+// 7. CATEGORY FILTERS
+// ============================================
 document.querySelectorAll(".filter-btn").forEach(button => {
     button.addEventListener("click", () => {
         activeCategory = button.dataset.filter;
 
-        document.querySelectorAll(".filter-btn").forEach(btn =>
-            btn.classList.toggle("active", btn === button)
-        );
+        document.querySelectorAll(".filter-btn").forEach(btn => {
+            btn.classList.toggle("active", btn === button);
+        });
 
         renderProducts();
     });
 });
 
-// Collection cards also select their category
+// ============================================
+// 8. COLLECTION CATEGORY LINKS
+// ============================================
 document.querySelectorAll(".collection-card").forEach(card => {
     card.addEventListener("click", () => {
-        activeCategory = card.dataset.category;
+        activeCategory = card.dataset.category || "All";
 
         document.querySelectorAll(".filter-btn").forEach(button => {
             button.classList.toggle(
@@ -130,195 +169,445 @@ document.querySelectorAll(".collection-card").forEach(card => {
     });
 });
 
-// Sorting
-document.getElementById("sortSelect")
-    .addEventListener("change", renderProducts);
+// ============================================
+// 9. PRODUCT SORTING
+// ============================================
+const sortSelect = document.getElementById("sortSelect");
 
-// Search panel
-const searchPanel = document.getElementById("searchPanel");
-const searchInput = document.getElementById("searchInput");
+if (sortSelect) {
+    sortSelect.addEventListener("change", renderProducts);
+}
 
-document.getElementById("searchBtn").addEventListener("click", () => {
-    searchPanel.classList.toggle("visible");
+// ============================================
+// 10. SEARCH
+// ============================================
+const searchBtn = document.getElementById("searchBtn");
+const closeSearch = document.getElementById("closeSearch");
 
-    if (searchPanel.classList.contains("visible")) {
-        searchInput.focus();
-    }
-});
+if (searchBtn) {
+    searchBtn.addEventListener("click", () => {
+        if (!searchPanel) return;
 
-document.getElementById("closeSearch").addEventListener("click", () => {
-    searchPanel.classList.remove("visible");
-    searchInput.value = "";
-    searchQuery = "";
-    renderProducts();
-});
+        searchPanel.classList.toggle("visible");
 
-searchInput.addEventListener("input", () => {
-    searchQuery = searchInput.value.trim();
-    renderProducts();
-
-    document.getElementById("products").scrollIntoView({
-        behavior: "smooth",
-        block: "start"
+        if (searchPanel.classList.contains("visible")) {
+            searchInput?.focus();
+        }
     });
-});
+}
 
-// Mobile navigation
-document.getElementById("menuBtn").addEventListener("click", () => {
-    const nav = document.getElementById("navLinks");
-    const isOpen = nav.classList.toggle("show");
+if (closeSearch) {
+    closeSearch.addEventListener("click", () => {
+        searchPanel?.classList.remove("visible");
 
-    document.getElementById("menuBtn")
-        .setAttribute("aria-expanded", String(isOpen));
-});
+        if (searchInput) {
+            searchInput.value = "";
+        }
+
+        searchQuery = "";
+        renderProducts();
+    });
+}
+
+if (searchInput) {
+    searchInput.addEventListener("input", () => {
+        searchQuery = searchInput.value.trim();
+        renderProducts();
+    });
+}
+
+// ============================================
+// 11. MOBILE NAVIGATION
+// ============================================
+const menuBtn = document.getElementById("menuBtn");
+
+if (menuBtn) {
+    menuBtn.addEventListener("click", () => {
+        const nav = document.getElementById("navLinks");
+        const isOpen = nav?.classList.toggle("show") || false;
+
+        menuBtn.setAttribute("aria-expanded", String(isOpen));
+    });
+}
 
 document.querySelectorAll(".nav-links a").forEach(link => {
     link.addEventListener("click", () => {
-        document.getElementById("navLinks").classList.remove("show");
-        document.getElementById("menuBtn")
-            .setAttribute("aria-expanded", "false");
+        document.getElementById("navLinks")?.classList.remove("show");
+        menuBtn?.setAttribute("aria-expanded", "false");
     });
 });
 
-// Shopping cart
+// ============================================
+// 12. PRODUCT DETAILS MODAL
+// ============================================
+function showProductDetails(product) {
+    if (!productModal) {
+        console.error(
+            'Missing #productModal. Add the modal container in index.html.'
+        );
+        return;
+    }
+
+    const options = productOptions[product.id] || {
+        sizes: ["One Size"],
+        colors: ["Standard"]
+    };
+
+    productModal.innerHTML = `
+        <div class="modal-backdrop" data-close-modal></div>
+
+        <section
+            class="modal-content"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Product details"
+        >
+            <button
+                class="modal-close"
+                data-close-modal
+                aria-label="Close product details"
+            >✕</button>
+
+            <img src="${product.image}" alt="${product.name}">
+
+            <div class="modal-details">
+                <span class="product-category">${product.category}</span>
+
+                <h2>${product.name}</h2>
+
+                <p class="modal-price">${formatPrice(product.price)}</p>
+
+                <label for="productSize">Select size</label>
+
+                <select id="productSize">
+                    ${options.sizes.map(size => `
+                        <option value="${size}">${size}</option>
+                    `).join("")}
+                </select>
+
+                <label for="productColor">Select colour</label>
+
+                <select id="productColor">
+                    ${options.colors.map(color => `
+                        <option value="${color}">${color}</option>
+                    `).join("")}
+                </select>
+
+                <p class="stock-note">
+                    Demo options only. Live stock is not connected.
+                </p>
+
+                <button
+                    class="btn btn-dark modal-add"
+                    id="modalAddToCart"
+                >
+                    Add to bag — ${formatPrice(product.price)}
+                </button>
+            </div>
+        </section>
+    `;
+
+    productModal.classList.add("visible");
+    productModal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+
+    productModal.querySelectorAll("[data-close-modal]").forEach(button => {
+        button.addEventListener("click", closeProductDetails);
+    });
+
+    const addButton = document.getElementById("modalAddToCart");
+
+    if (addButton) {
+        addButton.addEventListener("click", () => {
+            const size = document.getElementById("productSize").value;
+            const color = document.getElementById("productColor").value;
+
+            addConfiguredProductToCart(product, size, color);
+
+            closeProductDetails();
+            openCart();
+        });
+    }
+
+    productModal.querySelector(".modal-close")?.focus();
+}
+
+function closeProductDetails() {
+    if (!productModal) return;
+
+    productModal.classList.remove("visible");
+    productModal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+}
+
+// ============================================
+// 13. PRODUCT CARD CLICK HANDLER
+// IMPORTANT: Only ONE delegated listener.
+// Card click opens details; green + quick-adds.
+// ============================================
+if (productGrid) {
+    productGrid.addEventListener("click", event => {
+        const addButton = event.target.closest("[data-add]");
+
+        // Green + button: add a default variant directly.
+        if (addButton) {
+            addToCart(Number(addButton.dataset.add));
+            return;
+        }
+
+        // Clicking elsewhere on a product card opens details.
+        const card = event.target.closest(".product-card");
+        if (!card) return;
+
+        const productId = Number(card.dataset.productId);
+        const product = products.find(item => item.id === productId);
+
+        if (product) {
+            showProductDetails(product);
+        }
+    });
+}
+
+// ============================================
+// 14. ADD TO CART
+// ============================================
 function addToCart(productId) {
     const product = products.find(item => item.id === productId);
     if (!product) return;
 
-    const existing = cart.find(item => item.id === productId);
+    // Quick-add uses the first available demo size and colour.
+    const options = productOptions[productId] || {
+        sizes: ["One Size"],
+        colors: ["Standard"]
+    };
 
-    if (existing) {
-        existing.quantity++;
-    } else {
-        cart.push({ ...product, quantity: 1 });
-    }
+    addConfiguredProductToCart(
+        product,
+        options.sizes[0],
+        options.colors[0]
+    );
 
-    renderCart();
     openCart();
 }
 
-function changeQuantity(productId, amount) {
-    const item = cart.find(product => product.id === productId);
+// Add a selected size/colour combination.
+// Each variant combination is stored separately.
+function addConfiguredProductToCart(product, size, color) {
+    const existing = cart.find(item =>
+        item.id === product.id &&
+        item.selectedSize === size &&
+        item.selectedColor === color
+    );
+
+    if (existing) {
+        existing.quantity += 1;
+    } else {
+        cart.push({
+            ...product,
+            selectedSize: size,
+            selectedColor: color,
+            quantity: 1,
+            cartKey: `${product.id}-${size}-${color}`
+        });
+    }
+
+    renderCart();
+}
+
+// ============================================
+// 15. CHANGE CART QUANTITY
+// ============================================
+function changeQuantity(cartKey, amount) {
+    const item = cart.find(product => product.cartKey === cartKey);
     if (!item) return;
 
     item.quantity += amount;
 
     if (item.quantity <= 0) {
-        cart = cart.filter(product => product.id !== productId);
+        cart = cart.filter(product => product.cartKey !== cartKey);
     }
 
     renderCart();
 }
 
-function removeFromCart(productId) {
-    cart = cart.filter(product => product.id !== productId);
+// ============================================
+// 16. REMOVE CART ITEM
+// ============================================
+function removeFromCart(cartKey) {
+    cart = cart.filter(product => product.cartKey !== cartKey);
     renderCart();
 }
 
+// ============================================
+// 17. RENDER SHOPPING CART
+// ============================================
 function renderCart() {
+    const cartItems = document.getElementById("cartItems");
+    if (!cartItems) return;
+
     const totalItems = cart.reduce(
-        (sum, item) => sum + item.quantity, 0
+        (sum, item) => sum + item.quantity,
+        0
     );
 
     const totalPrice = cart.reduce(
-        (sum, item) => sum + item.price * item.quantity, 0
+        (sum, item) => sum + item.price * item.quantity,
+        0
     );
 
-    document.getElementById("cartCount").textContent = totalItems;
-    document.getElementById("drawerCount").textContent = `(${totalItems})`;
-    document.getElementById("cartTotal").textContent =
-        formatPrice(totalPrice);
+    const cartCount = document.getElementById("cartCount");
+    const drawerCount = document.getElementById("drawerCount");
+    const cartTotal = document.getElementById("cartTotal");
 
-    document.getElementById("cartItems").innerHTML = cart.length
-        ? cart.map(item => `
+    if (cartCount) cartCount.textContent = totalItems;
+    if (drawerCount) drawerCount.textContent = `(${totalItems})`;
+    if (cartTotal) cartTotal.textContent = formatPrice(totalPrice);
+
+    if (cart.length > 0) {
+        cartItems.innerHTML = cart.map(item => `
             <div class="cart-item">
                 <img src="${item.image}" alt="${item.name}">
+
                 <div>
                     <h3>${item.name}</h3>
                     <p>${formatPrice(item.price)}</p>
+                    <p>Size: ${item.selectedSize}</p>
+                    <p>Colour: ${item.selectedColor}</p>
+
                     <div class="quantity-controls">
-                        <button data-minus="${item.id}" aria-label="Decrease quantity">−</button>
+                        <button
+                            data-minus="${item.cartKey}"
+                            aria-label="Decrease quantity"
+                        >−</button>
+
                         <span>${item.quantity}</span>
-                        <button data-plus="${item.id}" aria-label="Increase quantity">+</button>
+
+                        <button
+                            data-plus="${item.cartKey}"
+                            aria-label="Increase quantity"
+                        >+</button>
                     </div>
                 </div>
-                <button class="remove-btn" data-remove="${item.id}" aria-label="Remove item">✕</button>
-            </div>
-        `).join("")
-        : '<p style="padding:30px 0;color:#777970;font-size:13px;">Your bag is empty. Find something you love!</p>';
 
-    document.getElementById("checkoutMessage").textContent = "";
+                <button
+                    class="remove-btn"
+                    data-remove="${item.cartKey}"
+                    aria-label="Remove item"
+                >✕</button>
+            </div>
+        `).join("");
+    } else {
+        cartItems.innerHTML = `
+            <p style="padding:30px 0;color:#777970;font-size:13px;">
+                Your bag is empty. Find something you love!
+            </p>
+        `;
+    }
+
+    const checkoutMessage = document.getElementById("checkoutMessage");
+
+    if (checkoutMessage) {
+        checkoutMessage.textContent = "";
+    }
 }
 
-const cartDrawer = document.getElementById("cartDrawer");
-const cartBackdrop = document.getElementById("cartBackdrop");
-
+// ============================================
+// 18. OPEN AND CLOSE CART DRAWER
+// ============================================
 function openCart() {
+    if (!cartDrawer || !cartBackdrop) return;
+
     cartDrawer.classList.add("open");
     cartBackdrop.classList.add("visible");
     cartDrawer.setAttribute("aria-hidden", "false");
     document.body.classList.add("cart-open");
-    document.getElementById("closeCart").focus();
+
+    document.getElementById("closeCart")?.focus();
 }
 
 function closeCart() {
-    cartDrawer.classList.remove("open");
-    cartBackdrop.classList.remove("visible");
-    cartDrawer.setAttribute("aria-hidden", "true");
+    cartDrawer?.classList.remove("open");
+    cartBackdrop?.classList.remove("visible");
+    cartDrawer?.setAttribute("aria-hidden", "true");
     document.body.classList.remove("cart-open");
 }
 
-document.getElementById("cartBtn").addEventListener("click", openCart);
-document.getElementById("closeCart").addEventListener("click", closeCart);
-cartBackdrop.addEventListener("click", closeCart);
+document.getElementById("cartBtn")?.addEventListener("click", openCart);
+document.getElementById("closeCart")?.addEventListener("click", closeCart);
+cartBackdrop?.addEventListener("click", closeCart);
 
-document.addEventListener("keydown", event => {
-    if (event.key === "Escape") {
-        closeCart();
-        searchPanel.classList.remove("visible");
-    }
-});
+// ============================================
+// 19. CART BUTTON HANDLER
+// ============================================
+const cartItemsContainer = document.getElementById("cartItems");
 
-productGrid.addEventListener("click", event => {
-    const button = event.target.closest("[data-add]");
-    if (button) addToCart(Number(button.dataset.add));
-});
+if (cartItemsContainer) {
+    cartItemsContainer.addEventListener("click", event => {
+        const button = event.target.closest("button");
+        if (!button) return;
 
-document.getElementById("cartItems").addEventListener("click", event => {
-    const button = event.target.closest("button");
-    if (!button) return;
+        if (button.dataset.plus) {
+            changeQuantity(button.dataset.plus, 1);
+        } else if (button.dataset.minus) {
+            changeQuantity(button.dataset.minus, -1);
+        } else if (button.dataset.remove) {
+            removeFromCart(button.dataset.remove);
+        }
+    });
+}
 
-    if (button.dataset.plus) {
-        changeQuantity(Number(button.dataset.plus), 1);
-    } else if (button.dataset.minus) {
-        changeQuantity(Number(button.dataset.minus), -1);
-    } else if (button.dataset.remove) {
-        removeFromCart(Number(button.dataset.remove));
-    }
-});
-
-// Demo checkout only — no payment is processed
-document.getElementById("checkoutBtn").addEventListener("click", () => {
+// ============================================
+// 20. DEMO CHECKOUT
+// No real payment is processed.
+// ============================================
+document.getElementById("checkoutBtn")?.addEventListener("click", () => {
     const message = document.getElementById("checkoutMessage");
+    if (!message) return;
 
     message.textContent = cart.length
         ? "Demo only: checkout and payment will be added later."
         : "Your bag is empty. Add a product first.";
 });
 
-// Newsletter demo
-document.getElementById("newsletterForm").addEventListener("submit", event => {
+// ============================================
+// 21. NEWSLETTER DEMO
+// No email is sent or stored.
+// ============================================
+document.getElementById("newsletterForm")?.addEventListener("submit", event => {
     event.preventDefault();
 
-    document.getElementById("formMessage").textContent =
-        "Thanks for your interest! Newsletter signup is a demo for now.";
+    const message = document.getElementById("formMessage");
+
+    if (message) {
+        message.textContent =
+            "Thanks for your interest! Newsletter signup is a demo for now.";
+    }
 
     event.target.reset();
 });
 
-// Footer year
-document.getElementById("year").textContent = new Date().getFullYear();
+// ============================================
+// 22. KEYBOARD ESCAPE HANDLER
+// ============================================
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+        closeProductDetails();
+        closeCart();
+        searchPanel?.classList.remove("visible");
+    }
+});
 
-// Initial render
+// ============================================
+// 23. FOOTER YEAR
+// ============================================
+const yearElement = document.getElementById("year");
+
+if (yearElement) {
+    yearElement.textContent = new Date().getFullYear();
+}
+
+// ============================================
+// 24. INITIALIZE THE WEBSITE
+// ============================================
 renderProducts();
 renderCart();
